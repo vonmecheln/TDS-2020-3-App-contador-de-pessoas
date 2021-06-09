@@ -58,9 +58,12 @@ class _MyHomePageState extends State<MyHomePage> {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "$pessoas Pessoas",
-              style: Theme.of(context).textTheme.headline1,
+            FittedBox(
+              fit: BoxFit.fitWidth,
+              child: Text(
+                "$pessoas Pessoas",
+                style: Theme.of(context).textTheme.headline1,
+              ),
             ),
             Container(height: 200),
             Row(
