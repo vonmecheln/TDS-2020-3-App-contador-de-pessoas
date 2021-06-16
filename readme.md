@@ -4,3 +4,4 @@ App #1 contador de pessoas: [projeto_flutter](projeto_flutter)
 
 App #2 Calculadora IMC: [imc](imc)
 
+App #3 Conversor de Moedas: [moeda](moeda)
