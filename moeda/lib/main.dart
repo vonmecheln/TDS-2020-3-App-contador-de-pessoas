@@ -8,15 +8,14 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Conversor de moedas',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Câmbio'),
     );
   }
 }
@@ -30,11 +29,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-const api_url = "https:///";
-
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   Future<String> getData() async {
     var url = Uri.https('api.hgbrasil.com', '/finance');
     // var url = 'https://api.hgbrasil.com/finance';
@@ -50,15 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<Map> buscaMoedas() async {
     // await Future.delayed(Duration(seconds: 2));
-
     var retorno = await getData();
     return json.decode(retorno);
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
   }
 
   @override
@@ -67,14 +55,24 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: FutureBuilder(
-        future: buscaMoedas(),
-        builder: _tela,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FutureBuilder(
+            future: buscaMoedas(),
+            builder: _tela,
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+        onPressed: () {
+          setState(() {
+            buscaMoedas();
+          });
+        },
+        tooltip: 'Atualizar cotação',
+        child: Icon(Icons.refresh),
       ),
     );
   }

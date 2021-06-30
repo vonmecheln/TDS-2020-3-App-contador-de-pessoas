@@ -1,0 +1,47 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "imc",
+            "cwd": "imc",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "imc (profile mode)",
+            "cwd": "imc",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "moeda",
+            "cwd": "moeda",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "moeda (profile mode)",
+            "cwd": "moeda",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "projeto_flutter",
+            "cwd": "projeto_flutter",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "projeto_flutter (profile mode)",
+            "cwd": "projeto_flutter",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        }
+    ]
+}
