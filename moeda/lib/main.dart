@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:awesome_dropdown/awesome_dropdown.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,6 +31,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool isLoading = false;
+
   Future<String> getData() async {
     var url = Uri.https('api.hgbrasil.com', '/finance');
     // var url = 'https://api.hgbrasil.com/finance';
@@ -43,10 +46,49 @@ class _MyHomePageState extends State<MyHomePage> {
     return "";
   }
 
+  @override
+  void initState() {
+    super.initState();
+    buscaMoedas();
+  }
+
+  List<String> _listCurrencies = [""];
+  late Map currencies;
+
   Future<Map> buscaMoedas() async {
-    // await Future.delayed(Duration(seconds: 2));
+    isLoading = true;
+
+    await Future.delayed(Duration(seconds: 5));
     var retorno = await getData();
-    return json.decode(retorno);
+    var map = json.decode(retorno);
+
+    currencies = map["results"]["currencies"];
+    if (currencies.isNotEmpty) {
+      _listCurrencies.clear();
+      _selectedItemFrom = "BRL";
+      _selectedItemTo = "BRL";
+
+      currencies.forEach(
+          (key, value) => _listCurrencies.add(key == "source" ? value : key));
+    }
+
+    isLoading = false;
+    return map;
+  }
+
+  _calcularCambio() {
+    var taxaFrom = 0.0;
+    var taxaTo = 0.0;
+
+    taxaFrom =
+        _selectedItemFrom == "BRL" ? 1.0 : currencies[_selectedItemFrom]["buy"];
+
+    taxaTo =
+        _selectedItemTo == "BRL" ? 1.0 : currencies[_selectedItemTo]["buy"];
+
+    setState(() {
+      _result = _value * (taxaFrom / taxaTo);
+    });
   }
 
   @override
@@ -58,12 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          FutureBuilder(
-            future: buscaMoedas(),
-            builder: _tela,
-          )
-        ],
+        children: [_tela(context)],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -77,25 +114,62 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _tela(BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+  String _selectedItemFrom = "";
+  String _selectedItemTo = "";
+  double _value = 0;
+  double _result = 0;
+
+  Widget _tela(BuildContext context) {
     Widget conteudo = Container();
 
-    switch (snapshot.connectionState) {
-      case ConnectionState.none:
-      case ConnectionState.waiting:
-        conteudo = CircularProgressIndicator();
-        break;
-      default:
-        if (!snapshot.hasError) {
-          double dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
+    conteudo = isLoading
+        ? CircularProgressIndicator()
+        : Column(
+            children: [
+              TextFormField(
+                keyboardType: TextInputType.numberWithOptions(
+                  signed: false,
+                  decimal: true,
+                ),
+                onChanged: (text) {
+                  _value = double.tryParse(text) ?? 0;
 
-          conteudo = Text(dolar.toStringAsPrecision(3),
-              style: TextStyle(
-                fontSize: 28,
-                color: Colors.green,
-              ));
-        }
-    }
+                  _calcularCambio();
+                },
+              ),
+              AwesomeDropDown(
+                dropDownList: _listCurrencies,
+                dropDownIcon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.grey,
+                  size: 23,
+                ),
+                selectedItem: _selectedItemFrom,
+                onDropDownItemClick: (selectedItem) {
+                  _selectedItemFrom = selectedItem;
+                  _calcularCambio();
+                },
+              ),
+              AwesomeDropDown(
+                dropDownList: _listCurrencies,
+                dropDownIcon: Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.grey,
+                  size: 23,
+                ),
+                selectedItem: _selectedItemFrom,
+                onDropDownItemClick: (selectedItem) {
+                  _selectedItemTo = selectedItem;
+                  _calcularCambio();
+                },
+              ),
+              Text(_result.toStringAsPrecision(3),
+                  style: TextStyle(
+                    fontSize: 28,
+                    color: Colors.green,
+                  )),
+            ],
+          );
 
     return Center(child: conteudo);
   }
