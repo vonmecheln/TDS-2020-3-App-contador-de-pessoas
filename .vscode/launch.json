@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "lista_tarefa",
+            "cwd": "lista_tarefa",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
             "name": "imc",
             "cwd": "imc",
             "request": "launch",

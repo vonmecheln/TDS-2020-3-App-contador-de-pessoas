@@ -41,7 +41,10 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     data.load().then((value) {
-      _toDoList = json.decode(value);
+      if (value.isNotEmpty)
+        setState(() {
+          _toDoList = json.decode(value);
+        });
     });
   }
 
