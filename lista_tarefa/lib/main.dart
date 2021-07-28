@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:lista_tarefa/data.dart';
 import 'package:lista_tarefa/persistence/file_persistence.dart';
+import 'package:lista_tarefa/persistence/key_value_persistence.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,7 +32,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final PersistenceData data = new FilePersistence();
+  final PersistenceData data = new KeyValuePersistence();
 
   final _textController = TextEditingController();
   var _posRemoved = 0;
