@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:lista_tarefa/data.dart';
-import 'package:lista_tarefa/persistence/file_persistence.dart';
-import 'package:lista_tarefa/persistence/key_value_persistence.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,7 +30,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final PersistenceData data = new KeyValuePersistence();
+  PersistenceData data = DataFactory.getProvider();
 
   final _textController = TextEditingController();
   var _posRemoved = 0;
@@ -41,11 +39,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
     data.load().then((value) {
-      if (value.isNotEmpty)
-        setState(() {
-          _toDoList = json.decode(value);
-        });
+      setState(() {
+        _toDoList = value.isNotEmpty ? json.decode(value) : [];
+      });
     });
   }
 
@@ -83,10 +84,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lista de Terefas'),
-        backgroundColor: Colors.blueAccent,
-        centerTitle: true,
-      ),
+          title: Text('Lista de Terefas'),
+          backgroundColor: Colors.blueAccent,
+          centerTitle: true,
+          actions: [
+            PopupMenuButton(itemBuilder: (context) {
+              return persistenceProvider.values
+                  .map((e) => PopupMenuItem(
+                        child: StatefulBuilder(
+                          builder: (_, __) => buildProviderButton(e),
+                        ),
+                      ))
+                  .toList();
+            })
+          ]),
       body: Container(
         padding: EdgeInsets.all(8.0),
         child: Column(
@@ -177,5 +188,34 @@ class _MyHomePageState extends State<MyHomePage> {
             ScaffoldMessenger.of(context).showSnackBar(snack);
           });
         });
+  }
+
+  Widget buildProviderButton(persistenceProvider type) {
+    return IconButton(
+      onPressed: () {
+        data = DataFactory.getProvider(type: type);
+        _loadData();
+        Navigator.pop(context);
+      },
+      icon: Icon(
+        _getIcon(type),
+      ),
+      color: DataFactory.providerType == type ? Colors.blue : Colors.grey,
+    );
+  }
+
+  IconData _getIcon(persistenceProvider type) {
+    {
+      switch (type) {
+        case persistenceProvider.File:
+          return Icons.file_present_outlined;
+        case persistenceProvider.KeyValue:
+          return Icons.vpn_key;
+        case persistenceProvider.SQLite:
+          return Icons.storage_outlined;
+        default:
+          return Icons.file_present_outlined;
+      }
+    }
   }
 }
