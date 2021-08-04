@@ -5,7 +5,7 @@ import 'package:path/path.dart';
 class SqlitePersistence implements PersistenceData {
   Database? database;
 
-  PersistenceData() async {
+  _open() async {
     database = await openDatabase(
       join(await getDatabasesPath(), 'DATA2.db'),
       onCreate: (db, version) {
@@ -19,6 +19,7 @@ class SqlitePersistence implements PersistenceData {
 
   @override
   Future<String> load() async {
+    await _open();
     final db = await database;
     String retorno = '';
 
@@ -40,6 +41,7 @@ class SqlitePersistence implements PersistenceData {
 
   @override
   Future<void> save(String data) async {
+    await _open();
     final db = await database;
 
     var value = {'id': 1, 'data': data};
